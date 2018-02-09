@@ -213,6 +213,11 @@ set(SOURCE_GFX
 	../common-cpp/fox/obj_model_loader.c
 	)
 
+set(SOURCE_PHY
+	phy/physics.hpp
+	phy/physics.cpp
+	)
+
 # static libraries don't work so well on Apple for some reason
 if(APPLE)
 	set(LIBRARY_TYPE SHARED)
@@ -225,7 +230,8 @@ set(CMAKE_AUTOMOC ON)
 add_executable(${PROJECT_NAME}
 	${MAIN_SOURCE}
 	${SOURCE_GFX}
-	${SOURCE_COMMON})
+	${SOURCE_COMMON}
+	${SOURCE_PHY})
 target_link_libraries(${PROJECT_NAME} ${LIBS} ${QT_LIBS})
 set(CMAKE_AUTOMOC OFF)
 
