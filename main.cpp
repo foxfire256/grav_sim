@@ -11,12 +11,10 @@ int main(int argc, char **argv)
 	physics ph;
 	ph.init(8);
 
-	qt_window window;
+	qt_window window(&ph);
 	window.show();
 	
 	window.setAnimating(true);
-
-	fflush(stdout);
 
 	return app.exec();
 }

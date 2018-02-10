@@ -12,22 +12,32 @@
 #include "gfx/gfx_factory.hpp"
 #include "gfx/gfx.hpp"
 
-opengl_window::opengl_window(QWindow *parent) : QWindow(parent)
+#include "phy/physics.hpp"
+#include "fox/counter.hpp"
+
+opengl_window::opengl_window(physics *p, QWindow *parent) : QWindow(parent)
 {
+	this->p = p;
+
 	g = nullptr;
 	
 	animating = false;
 	context = nullptr;
 	device = nullptr;
 	setSurfaceType(QWindow::OpenGLSurface);
+
+	phy_counter = new fox::counter();
 }
 
 opengl_window::~opengl_window()
 {
+	p->deinit();
+
 	if(device)
 		delete device;
 	g->deinit();
 	delete g;
+	delete phy_counter;
 }
 
 void opengl_window::render(QPainter *painter)
@@ -55,6 +65,7 @@ void opengl_window::render()
 	glEnable(GL_POLYGON_SMOOTH);
 	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 	
+	p->step(phy_counter->update_double());
 	g->render();
 	
 	device->setSize(size());

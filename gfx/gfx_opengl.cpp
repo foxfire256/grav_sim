@@ -18,13 +18,13 @@
 #include "fox/obj_model_loader.h"
 
 #ifdef __ANDROID__
-std::string data_root = "/sdcard/opengl_testing1";
+std::string data_root = "/sdcard/grav_sim";
 #elif __APPLE__
-std::string data_root = "/Users/foxfire/dev/opengl_testing1";
+std::string data_root = "/Users/foxfire/dev/grav_sim";
 #elif _WIN32
-std::string data_root = "C:/dev/opengl_testing1";
+std::string data_root = "C:/dev/grav_sim";
 #else // Linux
-std::string data_root = "/home/foxfire/dev/opengl_testing1";
+std::string data_root = "/home/foxfire/dev/grav_sim";
 #endif
 
 #define print_opengl_error() print_opengl_error2((char *)__FILE__, __LINE__)
@@ -200,11 +200,13 @@ void gfx_opengl::init(int w, int h)
 	glUniform3fv(u, 1, Kd.data());
 	print_opengl_error();
 	
+	rot_vel = 16.0f;
+
+	fflush(stdout);
+
 	// start counters
 	update_counter = new fox::counter();
 	fps_counter = new fox::counter();
-	
-	rot_vel = 16.0f;
 }
 
 void gfx_opengl::render()

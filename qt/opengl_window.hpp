@@ -11,12 +11,17 @@ class QOpenGLContext;
 class QOpenGLPaintDevice;
 
 class gfx;
+class physics;
+namespace fox
+{
+	class counter;
+}
 
 class opengl_window : public QWindow, protected QOpenGLFunctions
 {
 Q_OBJECT
 public:
-	explicit opengl_window(QWindow *parent = 0);
+	explicit opengl_window(physics *p, QWindow *parent = 0);
 	~opengl_window();
 	
 	virtual void render(QPainter *painter);
@@ -44,4 +49,6 @@ private:
 	QOpenGLPaintDevice *device;
 	
 	gfx *g;
+	physics *p;
+	fox::counter *phy_counter;
 };
