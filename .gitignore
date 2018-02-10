@@ -3,4 +3,4 @@ build/*
 *.exe
 cmake-build-debug/*
 cmake-build-release/*
-
+CMakeLists.txt.user
