@@ -13,20 +13,55 @@ physics::~physics()
 	delete perf_counter;
 }
 
+void physics::step(double delta_t)
+{
+	total_time += delta_t;
+
+	// TODO: make this RK4
+	// TODO: collision detection
+	// TODO: use OpenMP for this loop
+	for(uint16_t i = 0; i < obj_count; i++)
+	{
+		// find the force due to gravity first
+		Eigen::Vector3d f(0.0, 0.0, 0.0);
+		for(uint16_t j = 0; j < obj_count; j++)
+		{
+			if(i == j)
+				continue;
+
+			Eigen::Vector3d r = x[current][j] - x[current][i];
+			f += G * m[i] * m[j] * r.normalized() / r.squaredNorm();
+		}
+
+		a[next][i] = f / m[i] + a[current][i];
+
+		// TODO: RK4 here
+		v[next][i] = a[next][i] * delta_t + v[current][i];
+		x[next][i] = v[next][i] * delta_t + x[current][i];
+	}
+
+	current ? 0 : 1;
+	next ? 0 : 1;
+
+	perf_counter->update_double();
+}
+
 void physics::init(uint16_t obj_count)
 {
 	this->obj_count = obj_count;
 
 	current = 0;
 	next = 1;
+	total_time = 0.0;
 
-	xm[0].resize(obj_count);
-	xm[1].resize(obj_count);
+	x[0].resize(obj_count);
+	x[1].resize(obj_count);
 	v[0].resize(obj_count);
 	v[1].resize(obj_count);
 	a[0].resize(obj_count);
 	a[1].resize(obj_count);
 	r.resize(obj_count);
+	m.resize(obj_count);
 
 	// for now hard code some values
 	mass_range[0] = 1e6;
@@ -47,25 +82,33 @@ void physics::init(uint16_t obj_count)
 	for(uint16_t i = 0; i < obj_count; i++)
 	{
 		r[i] = dist_r(generator);
+		m[i] = dist_m(generator);
 
 		// TODO: detect and avoid collisions here
-		xm[0][i] = Eigen::Vector4d(dist_d(generator),
+		x[0][i] = Eigen::Vector3d(dist_d(generator),
 								dist_d(generator),
-								dist_d(generator),
-								dist_m(generator));
+								dist_d(generator));
 
 		v[0][i] = Eigen::Vector3d(0.0, 0.0, 0.0);
 		a[0][i] = Eigen::Vector3d(0.0, 0.0, 0.0);
 	}
+
+	for(uint8_t i = 0; i < 8; i++)
+		step_time[i] = 0.0;
+
+	perf_counter->update_double();
 }
 
 void physics::deinit()
 {
-	std::vector<Eigen::Vector4d> n0, n1;
-	xm[0].clear();
-	xm[1].clear();
-	xm[0].swap(n0);
-	xm[1].swap(n1);
+	// TODO: should we really use swap to force a deallocation and is this the
+	// right way to do it?
+
+	std::vector<Eigen::Vector3d> n0, n1;
+	x[0].clear();
+	x[1].clear();
+	x[0].swap(n0);
+	x[1].swap(n1);
 
 	std::vector<Eigen::Vector3d> n2, n3;
 	v[0].clear();
@@ -82,10 +125,10 @@ void physics::deinit()
 	std::vector<double> n6;
 	r.clear();
 	r.swap(n6);
+
+	std::vector<double> n7;
+	m.clear();
+	m.swap(n7);
 }
 
-void physics::step()
-{
-
-}
 

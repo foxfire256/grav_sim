@@ -21,7 +21,7 @@ public:
 
 	void init(uint16_t obj_count);
 	void deinit();
-	void step();
+	void step(double delta_t);
 
 private:
 	/**
@@ -29,13 +29,14 @@ private:
 	 */
 	uint16_t current, next;
 	uint16_t obj_count;
+	double total_time;
 	double mass_range[2];
 	double radius_range[2];
 	double distance_range[2];
 	/**
-	 * @brief Position and mass (x1, x2, x3, m), two vectors for new and old
+	 * @brief Position (x1, x2, x3), two vectors for new and old
 	 */
-	std::vector<Eigen::Vector4d> xm[2];
+	std::vector<Eigen::Vector3d> x[2];
 	/**
 	 * @brief Velocity, two vectors for new and old
 	 */
@@ -49,11 +50,17 @@ private:
 	 */
 	std::vector<double> r;
 	/**
+	 * @brief Object mass
+	 */
+	std::vector<double> m;
+	/**
 	 * @brief A random generator that is initialized in the constructor
 	 */
 	std::mt19937_64 generator;
 
 	fox::counter *perf_counter;
+	double step_time[8];
+	double G = 6.67408e-11;
 };
 
 #endif
