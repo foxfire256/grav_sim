@@ -33,7 +33,8 @@ void physics::step(double delta_t)
 			f += G * m[i] * m[j] * r.normalized() / r.squaredNorm();
 		}
 
-		a[next][i] = f / m[i] + a[current][i];
+		//a[next][i] = f / m[i] + a[current][i];
+		a[next][i] = f / m[i];
 
 		// TODO: RK4 here
 		v[next][i] = a[next][i] * delta_t + v[current][i];
