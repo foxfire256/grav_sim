@@ -203,8 +203,8 @@ if(NOT MSVC)
 	# -ftree-vectorize not sure how well this does
 	# -mavx
 	# -mavx2
-	set(CMAKE_C_FLAGS_RELEASE "-O3")
-	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -w")
+	set(CMAKE_C_FLAGS_RELEASE "-O3 -fopenmp")
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -fopenmp -w")
 	
 	# force some better debugging
 	# this should be gcc
