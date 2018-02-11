@@ -1,12 +1,10 @@
  
 #include "opengl_window.hpp"
 
-class physics;
-
 class qt_window : public opengl_window
 {
 public:
-	qt_window(physics *p);
+	qt_window();
 	
 	void render() override;
 	

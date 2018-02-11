@@ -1,10 +1,7 @@
-//
-// Created by foxfire on 1/20/18.
-//
-
 #ifndef GFX_HPP
 #define GFX_HPP
 
+class physics;
 
 class gfx
 {
@@ -16,6 +13,10 @@ public:
 	virtual void render(){}
 	virtual void deinit(){}
 	virtual void resize(int w, int h){}
+	physics * get_physics(){return p;}
+
+protected:
+	physics *p;
 };
 
 

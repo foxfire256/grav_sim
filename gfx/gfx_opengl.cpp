@@ -17,6 +17,8 @@
 #include "fox/gfx/eigen_opengl.hpp"
 #include "fox/obj_model_loader.h"
 
+#include "phy/physics.hpp"
+
 #ifdef __ANDROID__
 std::string data_root = "/sdcard/grav_sim";
 #elif __APPLE__
@@ -32,12 +34,12 @@ int print_opengl_error2(char *file, int line);
 
 gfx_opengl::gfx_opengl() : gfx()
 {
-
+	p = new physics();
 }
 
 gfx_opengl::~gfx_opengl()
 {
-
+	delete p;
 }
 
 void gfx_opengl::init(int w, int h)
@@ -45,6 +47,8 @@ void gfx_opengl::init(int w, int h)
 	win_w = w;
 	win_h = h;
 	
+	p->init(8);
+
 	// init glew first
 	glewExperimental = GL_TRUE; // Needed in core profile
 	if(glewInit() != GLEW_OK)
@@ -82,8 +86,6 @@ void gfx_opengl::init(int w, int h)
 	glBindVertexArray(default_vao);
 	
 	// initialize some defaults
-	trans = {0.0f, 0.0f, 0.0f};
-	rot = {0.0f, 0.0f, 0.0f};
 	
 	eye = Eigen::Vector3f(0.0f, 0.0f, 3.0f);
 	target = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
@@ -207,10 +209,13 @@ void gfx_opengl::init(int w, int h)
 	// start counters
 	update_counter = new fox::counter();
 	fps_counter = new fox::counter();
+	phy_counter = new fox::counter();
 }
 
 void gfx_opengl::render()
 {
+	p->step(phy_counter->update_double());
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	float dt = update_counter->update();
@@ -299,6 +304,9 @@ void gfx_opengl::deinit()
 	
 	delete update_counter;
 	delete fps_counter;
+	delete phy_counter;
+
+	p->deinit();
 }
 
 void gfx_opengl::load_shaders()

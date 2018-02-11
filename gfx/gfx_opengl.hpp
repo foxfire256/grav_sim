@@ -68,6 +68,8 @@ private:
 	
 	void print_info();
 	void load_shaders();
+
+	fox::counter *phy_counter;
 };
 
 
