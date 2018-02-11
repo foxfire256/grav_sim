@@ -69,6 +69,15 @@ void gfx_opengl::init(int w, int h)
 	print_opengl_error();
 	
 	print_info();
+
+	GLint val;
+	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_BLOCKS, &val);
+	printf("GL_MAX_VERTEX_UNIFORM_BLOCKS: %i\n", val);
+	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_BLOCKS, &val);
+	printf("GL_MAX_FRAGMENT_UNIFORM_BLOCKS: %i\n", val);
+	glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &val);
+	printf("GL_MAX_UNIFORM_BLOCK_SIZE: %i\n", val);
+	printf("This means a max of %i objects\n", val/4/16);
 	
 	// init basic OpenGL stuff
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
