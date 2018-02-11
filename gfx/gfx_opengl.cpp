@@ -47,7 +47,7 @@ void gfx_opengl::init(int w, int h)
 	win_w = w;
 	win_h = h;
 	
-	p->init(128);
+	p->init(512);
 
 	// init glew first
 	glewExperimental = GL_TRUE; // Needed in core profile
@@ -217,7 +217,7 @@ void gfx_opengl::init(int w, int h)
 
 void gfx_opengl::update_matricies()
 {
-	// TODO: use OpenMP here
+	#pragma omp parallel for
 	for(uint16_t i = 0; i < p->get_obj_count(); i++)
 	{
 		Eigen::Vector3d x = p->get_pos()[i];

@@ -19,7 +19,6 @@ void physics::step(double delta_t)
 
 	// TODO: make this RK4
 	// TODO: collision detection
-	// TODO: use OpenMP for this loop
 	#pragma omp parallel for
 	for(uint16_t i = 0; i < obj_count; i++)
 	{
