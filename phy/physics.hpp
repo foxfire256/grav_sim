@@ -24,6 +24,7 @@ public:
 	void step(double delta_t);
 	uint16_t get_obj_count(){return obj_count;}
 	std::vector<Eigen::Vector3d> get_pos(){return x[current];}
+	std::vector<double> get_radii(){return r;}
 
 private:
 	/**

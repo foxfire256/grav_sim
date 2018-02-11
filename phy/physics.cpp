@@ -41,8 +41,8 @@ void physics::step(double delta_t)
 		x[next][i] = v[next][i] * delta_t + x[current][i];
 	}
 
-	current ? 0 : 1;
-	next ? 0 : 1;
+	current = current ? 0 : 1;
+	next = next ? 0 : 1;
 
 	perf_counter->update_double();
 }
@@ -65,12 +65,14 @@ void physics::init(uint16_t obj_count)
 	m.resize(obj_count);
 
 	// for now hard code some values
-	mass_range[0] = 1e6;
-	mass_range[1] = 1e7;
-	radius_range[0] = 1e4;
-	radius_range[1] = 1.2e4;
-	distance_range[0] = -radius_range[0] * 15.0;
-	distance_range[0] = radius_range[0] * 15.0;
+	mass_range[0] = 5e7;
+	mass_range[1] = 1e8;
+	radius_range[0] = 0.05;
+	radius_range[1] = 0.25;
+	//distance_range[0] = -radius_range[0] * 15.0;
+	//distance_range[1] = radius_range[0] * 15.0;
+	distance_range[0] = -4.0;
+	distance_range[1] = 4.0;
 
 	// random init stuff
 	std::uniform_real_distribution<double> dist_m(mass_range[0],

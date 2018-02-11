@@ -96,7 +96,7 @@ void gfx_opengl::init(int w, int h)
 	
 	// initialize some defaults
 	
-	eye = Eigen::Vector3f(0.0f, 0.0f, 3.0f);
+	eye = Eigen::Vector3f(0.0f, 0.0f, 10.0f);
 	target = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
 	up = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
 	
@@ -222,7 +222,8 @@ void gfx_opengl::update_matricies()
 	{
 		Eigen::Vector3d x = p->get_pos()[i];
 		Eigen::Vector3f x1 = {x[0], x[1], x[2]};
-		M[i] = Eigen::Translation3f(x1);
+		float scale = (float)(p->get_radii()[i]);
+		M[i] = Eigen::Translation3f(x1) * Eigen::Scaling(scale);
 
 		MV[i] = V * M[i];
 
@@ -251,16 +252,8 @@ void gfx_opengl::render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glUseProgram(shader_id);
-	int u;
-	// TODO: send these
-	/*
-	u = glGetUniformLocation(shader_id, "MVP");
-	glUniformMatrix4fv(u, 1, GL_FALSE, MVP.data());
-	u = glGetUniformLocation(shader_id, "MV");
-	glUniformMatrix4fv(u, 1, GL_FALSE, MV.data());
-	u = glGetUniformLocation(shader_id, "normal_matrix");
-	glUniformMatrix3fv(u, 1, GL_FALSE, normal_matrix.data());
-	*/
+
+
 	GLint vertex_loc, normal_loc;
 	vertex_loc = glGetAttribLocation(shader_id, "vertex");
 	normal_loc = glGetAttribLocation(shader_id, "normal");
@@ -272,8 +265,20 @@ void gfx_opengl::render()
 	glBindBuffer(GL_ARRAY_BUFFER, normal_vbo);
 	glEnableVertexAttribArray(normal_loc);
 	glVertexAttribPointer(normal_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	
-	glDrawArrays(GL_TRIANGLES, 0, mesh->vert_count);
+
+	int u;
+	for(uint16_t i = 0; i < p->get_obj_count(); i++)
+	{
+		// TODO: use UBO's here
+		u = glGetUniformLocation(shader_id, "MVP");
+		glUniformMatrix4fv(u, 1, GL_FALSE, MVP[i].data());
+		u = glGetUniformLocation(shader_id, "MV");
+		glUniformMatrix4fv(u, 1, GL_FALSE, MV[i].data());
+		u = glGetUniformLocation(shader_id, "normal_matrix");
+		glUniformMatrix3fv(u, 1, GL_FALSE, normal_matrix[i].data());
+
+		glDrawArrays(GL_TRIANGLES, 0, mesh->vert_count);
+	}
 	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
