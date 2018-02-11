@@ -22,6 +22,8 @@ public:
 	void init(uint16_t obj_count);
 	void deinit();
 	void step(double delta_t);
+	uint16_t get_obj_count(){return obj_count;}
+	std::vector<Eigen::Vector3d> get_pos(){return x[current];}
 
 private:
 	/**

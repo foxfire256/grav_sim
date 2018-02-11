@@ -7,6 +7,7 @@
 
 #include "gfx.hpp"
 
+#include <vector>
 #include <cstdint>
 
 #define _USE_MATH_DEFINES
@@ -44,10 +45,10 @@ private:
 	Eigen::Affine3f V;
 	Eigen::Projective3f P;
 	// model matrix (specific to the model instance)
-	Eigen::Projective3f MVP;
-	Eigen::Affine3f M, MV;
+	std::vector<Eigen::Projective3f> MVP;
+	std::vector<Eigen::Affine3f> M, MV;
 	// TODO: should this be Affine3f ?
-	Eigen::Matrix3f normal_matrix;
+	std::vector<Eigen::Matrix3f> normal_matrix;
 	// more shader uniforms
 	Eigen::Vector4f light_pos, color;
 	Eigen::Vector3f La, Ls, Ld;
@@ -70,6 +71,8 @@ private:
 	void load_shaders();
 
 	fox::counter *phy_counter;
+
+	void update_matricies();
 };
 
 
