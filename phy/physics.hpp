@@ -8,11 +8,6 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-namespace fox
-{
-	class counter;
-}
-
 class physics
 {
 public:
@@ -61,8 +56,6 @@ private:
 	 */
 	std::mt19937_64 generator;
 
-	fox::counter *perf_counter;
-	double step_time[8];
 	double G = 6.67408e-11;
 };
 

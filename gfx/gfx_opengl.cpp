@@ -47,7 +47,7 @@ void gfx_opengl::init(int w, int h)
 	win_w = w;
 	win_h = h;
 	
-	p->init(8);
+	p->init(32);
 
 	// init glew first
 	glewExperimental = GL_TRUE; // Needed in core profile
@@ -106,9 +106,6 @@ void gfx_opengl::init(int w, int h)
 	La = Eigen::Vector3f(1.0f,1.0f, 1.0f);
 	Ls = Eigen::Vector3f(1.0f,1.0f, 1.0f);
 	Ld = Eigen::Vector3f(1.0f,1.0f, 1.0f);
-	rot = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
-	trans = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
-	scale = 1.0f;
 	light_pos = Eigen::Vector4f(eye[0], eye[1], eye[2], 1.0f);
 	fox::gfx::perspective(65.0f, (float)w / (float)h, 0.01f, 40.0f, P);
 	
@@ -130,7 +127,7 @@ void gfx_opengl::init(int w, int h)
 		printf("Failed to allocate memory for obj model\n");
 		exit(-1);
 	}
-	std::string mesh_file = data_root + "/meshes/icosphere.obj";
+	std::string mesh_file = data_root + "/meshes/uv_sphere2.obj";
 	obj_model_load(mesh_file.c_str(), mesh);
 	if(obj_model_check_arrays(mesh))
 		obj_model_gl_arrays(mesh);
@@ -187,14 +184,7 @@ void gfx_opengl::init(int w, int h)
 	glUniform3fv(u, 1, Ld.data());
 	u = glGetUniformLocation(shader_id, "color");
 	glUniform4fv(u, 1, color.data());
-	/*
-	u = glGetUniformLocation(shader_id, "MVP");
-	glUniformMatrix4fv(u, 1, GL_FALSE, MVP.data());
-	u = glGetUniformLocation(shader_id, "MV");
-	glUniformMatrix4fv(u, 1, GL_FALSE, MV.data());
-	u = glGetUniformLocation(shader_id, "normal_matrix");
-	glUniformMatrix3fv(u, 1, GL_FALSE, normal_matrix.data());
-	*/
+
 	u = glGetUniformLocation(shader_id, "shininess");
 	glUniform1f(u, shininess);
 	u = glGetUniformLocation(shader_id, "Ka");
@@ -204,13 +194,23 @@ void gfx_opengl::init(int w, int h)
 	u = glGetUniformLocation(shader_id, "Kd");
 	glUniform3fv(u, 1, Kd.data());
 	print_opengl_error();
-	
-	rot_vel = 16.0f;
+
+	for(uint8_t i = 0; i < perf_array_size; i++)
+	{
+		phys_times[i] = 0.0;
+		gfx_matrix_times[i] = 0.0;
+		render_times[i] = 0.0;
+	}
+	phys_time = 0.0;
+	gfx_matrix_time = 0.0;
+	render_time = 0.0;
+	perf_index = 0;
+	total_time = 0.0;
 
 	fflush(stdout);
 
 	// start counters
-	update_counter = new fox::counter();
+	perf_counter = new fox::counter();
 	fps_counter = new fox::counter();
 	phy_counter = new fox::counter();
 }
@@ -245,9 +245,36 @@ void gfx_opengl::update_matricies()
 
 void gfx_opengl::render()
 {
+	// TODO: this isn't the most accurate way to calc FPS
+	render_times[perf_index] = perf_counter->update_double();
+
 	p->step(phy_counter->update_double());
+	phys_times[perf_index] = perf_counter->update_double();
 
 	update_matricies();
+	gfx_matrix_times[perf_index] = perf_counter->update_double();
+
+	perf_index++;
+	if(perf_index >= perf_array_size)
+		perf_index = 0;
+	total_time += fps_counter->update_double();
+	if(total_time >= 1.0)
+	{
+		phys_time = 0.0;
+		gfx_matrix_time = 0.0;
+		render_time = 0.0;
+		for(uint8_t i = 0; i < perf_array_size; i++)
+		{
+			phys_time += phys_times[i];
+			gfx_matrix_time += gfx_matrix_times[i];
+			render_time += render_times[i];
+		}
+		printf("Physics time:    %.9f\n", phys_time);
+		printf("GFX matrix time: %.9f\n", gfx_matrix_time);
+		printf("Render time:     %.9f\n", render_time);
+		printf("----------------------------\n");
+		total_time = 0.0;
+	}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -319,7 +346,7 @@ void gfx_opengl::deinit()
 	// TODO: this probably can be done after the VBOs are created
 	obj_model_free(mesh);
 	
-	delete update_counter;
+	delete perf_counter;
 	delete fps_counter;
 	delete phy_counter;
 

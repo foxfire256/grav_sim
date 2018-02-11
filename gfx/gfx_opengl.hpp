@@ -54,23 +54,28 @@ private:
 	Eigen::Vector3f La, Ls, Ld;
 	Eigen::Vector3f Ka, Ks, Kd;
 	float shininess;
-	Eigen::Vector3f rot, trans;
-	float scale;
 	
 	GLuint shader_id, shader_vert_id, shader_frag_id;
 	GLuint vertex_vbo, normal_vbo;
 	
-	fox::counter *update_counter;
+	fox::counter *phy_counter;
 	fox::counter *fps_counter;
-	
-	float rot_vel;
+	fox::counter *perf_counter;
+
+	const static uint8_t perf_array_size = 8;
+	double phys_times[perf_array_size];
+	double gfx_matrix_times[perf_array_size];
+	double render_times[perf_array_size];
+	double phys_time;
+	double gfx_matrix_time;
+	double render_time;
+	uint8_t perf_index;
+	double total_time;
 	
 	OBJ_MODEL *mesh;
 	
 	void print_info();
 	void load_shaders();
-
-	fox::counter *phy_counter;
 
 	void update_matricies();
 };

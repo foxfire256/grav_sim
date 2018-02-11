@@ -5,12 +5,12 @@
 physics::physics()
 {
 	this->generator = std::mt19937_64(std::random_device{}());
-	perf_counter = new fox::counter();
+
 }
 
 physics::~physics()
 {
-	delete perf_counter;
+
 }
 
 void physics::step(double delta_t)
@@ -43,8 +43,6 @@ void physics::step(double delta_t)
 
 	current = current ? 0 : 1;
 	next = next ? 0 : 1;
-
-	perf_counter->update_double();
 }
 
 void physics::init(uint16_t obj_count)
@@ -95,11 +93,6 @@ void physics::init(uint16_t obj_count)
 		v[0][i] = Eigen::Vector3d(0.0, 0.0, 0.0);
 		a[0][i] = Eigen::Vector3d(0.0, 0.0, 0.0);
 	}
-
-	for(uint8_t i = 0; i < 8; i++)
-		step_time[i] = 0.0;
-
-	perf_counter->update_double();
 }
 
 void physics::deinit()
