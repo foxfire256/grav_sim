@@ -1,15 +1,18 @@
 cmake_minimum_required(VERSION 3.0.0)
 # cmake version 3.0.0 is needed for block comments, 2.8.11 was the previous
 # min version
+
+# bad but needed from OpenMP
+if(APPLE)
+	# use clang from homebrew for OpenMP support
+	set(CMAKE_C_COMPILER "/usr/local/opt/llvm/bin/clang")
+	set(CMAKE_CXX_COMPILER "/usr/local/opt/llvm/bin/clang++")
+endif(APPLE)
 project(gs)
 
 # http://www.cmake.org/Wiki/CMake_Useful_Variables
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-
-include_directories("../common-cpp")
-
 
 # this hasn't been tested for Visual studio as of 2018.01.20
 # this assumes you are running cmake from a build directory in the source directory
@@ -112,6 +115,10 @@ if(APPLE)
 	set(CMAKE_INCLUDE_PATH "/usr/local/include")
 	set(CMAKE_LIBRARY_PATH "/usr/local/lib")
 	
+	set(CMAKE_C_COMPILER "/usr/local/opt/llvm/bin/clang")
+	set(CMAKE_CXX_COMPILER "/usr/local/opt/llvm/bin/clang++")
+	include_directories("/usr/local/opt/llvm/include")
+	
 	find_package(OpenGL REQUIRED)
 	find_package(Boost COMPONENTS program_options system filesystem REQUIRED)
 	include_directories(${Boost_INCLUDE_DIRS})
@@ -119,7 +126,12 @@ if(APPLE)
 	include_directories(${GLEW_INCLUDE_DIRS})
 
 	set(BOOST_LIBS ${Boost_LIBRARIES})
-	set(LIBS -L/usr/local/lib ${LIBS} ${Boost_LIBRARIES})
+	set(LIBS
+		-L/usr/local/lib
+		-L/usr/local/opt/llvm/lib
+		${LIBS}
+		${Boost_LIBRARIES}
+	)
 	
 	INCLUDE(FindPkgConfig)
 	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
@@ -190,6 +202,7 @@ if(UNIX AND NOT APPLE)
 
 endif(UNIX AND NOT APPLE)
 
+include_directories("../common-cpp")
 
 if(NOT MSVC)
 	# --------------------------------------------------------------------------
