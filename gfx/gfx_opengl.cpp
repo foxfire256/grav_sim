@@ -47,7 +47,7 @@ void gfx_opengl::init(int w, int h)
 	win_w = w;
 	win_h = h;
 	
-	p->init(32);
+	p->init(128);
 
 	// init glew first
 	glewExperimental = GL_TRUE; // Needed in core profile

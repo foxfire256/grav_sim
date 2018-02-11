@@ -27,6 +27,12 @@ if(MSVC)
 	set(VC_PREFIX "C:\\vclibs\\vc2015libs")
 	
 	set(LIBS ${LIBS} kernel32.lib)
+	set(SDL2_LIBRARIES
+		optimized "C:\\vclibs\\vc2015libs\\lib\\SDL2main.lib"
+		debug "C:\\vclibs\\vc2015libs\\lib\\debug\\SDL2main.lib")
+	set(SDL2_LIBRARIES ${SDL2_LIBRARIES}
+		optimized "C:\\vclibs\\vc2015libs\\lib\\SDL2.lib"
+		debug "C:\\vclibs\\vc2015libs\\lib\\debug\\SDL2.lib")
 	set(GLEW_LIBRARIES
 		optimized "C:\\vclibs\\vc2015libs\\lib\\glew32.lib"
 		debug "C:\\vclibs\\vc2015libs\\lib\\debug\\glew32d.lib")
@@ -41,6 +47,13 @@ if(MSVC)
 		optimized "C:\\vclibs\\vc2015libs\\lib\\libboost_filesystem-vc140-mt-1_63.lib"
 		debug "C:\\vclibs\\vc2015libs\\lib\\debug\\libboost_filesystem-vc140-mt-gd-1_63.lib")
 	
+	set(SDL_LIBS
+		${LIBS}
+		${SDL2_LIBRARIES}
+		${GLEW_LIBRARIES}
+		${OPENGL_LIBRARIES}
+		)
+
 	set(QT_DIR "C:\\Qt\\Qt5.10.0\\5.10.0\\msvc2017_64")
 	
 	find_package(Qt5Core)
@@ -71,6 +84,15 @@ if(MINGW OR MSYS)
 
 	set(BOOST_LIBS ${Boost_LIBRARIES})
 	set(LIBS ${LIBS} ${Boost_LIBRARIES})
+	
+	INCLUDE(FindPkgConfig)
+	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+	include_directories(${SDL2_INCLUDE_DIR})
+	set(SDL_LIBS
+		${SDL2_LIBRARIES}
+		${GLEW_LIBRARIES}
+		${OPENGL_LIBRARIES}
+		)
 
 	find_package(Qt5Core)
 	find_package(Qt5Widgets)
@@ -98,6 +120,15 @@ if(APPLE)
 
 	set(BOOST_LIBS ${Boost_LIBRARIES})
 	set(LIBS -L/usr/local/lib ${LIBS} ${Boost_LIBRARIES})
+	
+	INCLUDE(FindPkgConfig)
+	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+	include_directories(${SDL2_INCLUDE_DIR})
+	set(SDL_LIBS
+		${SDL2_LIBRARIES}
+		${GLEW_LIBRARIES}
+		${OPENGL_LIBRARIES}
+		)
 
 	# If there are problems with qt5 on Apple run 'which qmake' and make sure
 	# it is the correct one. Usually you have to run 'brew link qt5 --force'.
@@ -131,6 +162,15 @@ if(UNIX AND NOT APPLE)
 	include_directories(${Boost_INCLUDE_DIRS})
 	find_package(GLEW REQUIRED)
 	include_directories(${GLEW_INCLUDE_DIRS})
+	
+	INCLUDE(FindPkgConfig)
+	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+	include_directories(${SDL2_INCLUDE_DIR})
+	set(SDL_LIBS
+		${SDL2_LIBRARIES}
+		${GLEW_LIBRARIES}
+		${OPENGL_LIBRARIES}
+		)
 
 	set(BOOST_LIBS ${Boost_LIBRARIES})
 	set(LIBS ${LIBS} ${Boost_LIBRARIES})
@@ -189,8 +229,8 @@ if(NOT MSVC)
 	set(CMAKE_LD_FLAGS "-pipe")
 endif(NOT MSVC)
 
-set(MAIN_SOURCE
-	main.cpp
+set(MAIN_SOURCE_QT
+	main_qt.cpp
 	qt/qt_window.hpp
 	qt/qt_window.cpp
 	qt/opengl_window.hpp
@@ -218,6 +258,12 @@ set(SOURCE_PHY
 	phy/physics.cpp
 	)
 
+set(MAIN_SOURCE_SDL
+	main_sdl.cpp
+	sdl/sdl_window.hpp
+	sdl/sdl_window.cpp
+)
+
 # static libraries don't work so well on Apple for some reason
 if(APPLE)
 	set(LIBRARY_TYPE SHARED)
@@ -225,14 +271,21 @@ else(APPLE)
 	set(LIBRARY_TYPE STATIC)
 endif(APPLE)
 
-# Instruct CMake to run Qt moc automatically when needed.
-set(CMAKE_AUTOMOC ON)
-add_executable(${PROJECT_NAME}
-	${MAIN_SOURCE}
+add_executable(${PROJECT_NAME}_sdl
+	${MAIN_SOURCE_SDL}
 	${SOURCE_GFX}
 	${SOURCE_COMMON}
 	${SOURCE_PHY})
-target_link_libraries(${PROJECT_NAME} ${LIBS} ${QT_LIBS})
+target_link_libraries(${PROJECT_NAME}_sdl ${LIBS} ${SDL_LIBS})
+
+# Instruct CMake to run Qt moc automatically when needed.
+set(CMAKE_AUTOMOC ON)
+add_executable(${PROJECT_NAME}_qt
+	${MAIN_SOURCE_QT}
+	${SOURCE_GFX}
+	${SOURCE_COMMON}
+	${SOURCE_PHY})
+target_link_libraries(${PROJECT_NAME}_qt ${LIBS} ${QT_LIBS})
 set(CMAKE_AUTOMOC OFF)
 
 
