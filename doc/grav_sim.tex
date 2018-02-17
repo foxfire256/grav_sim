@@ -1,0 +1,39 @@
+\documentclass[10pt,a4paper,notitlepage]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+
+
+
+% end of usepackage section -----------------------------------------------------
+
+\begin{document}
+
+\begin{equation}
+y_{n+1} = y_n + \tfrac{h}{6}\left(k_1 + 2k_2 + 2k_3 + k_4 \right)
+\end{equation}
+
+\begin{equation}
+t_{n+1} = t_n + h 
+\end{equation}
+
+\begin{equation}
+k_1 = f(t_n, y_n)
+\end{equation}
+
+\begin{equation}
+k_2 = f\left(t_n + \frac{h}{2}, y_n + h\frac{k_1}{2}\right)
+\end{equation}
+
+\begin{equation}
+k_3 = f\left(t_n + \frac{h}{2}, y_n + h\frac{k_2}{2}\right)
+\end{equation}
+
+\begin{equation}
+k_4 = f\left(t_n + h, y_n + hk_3\right)
+\end{equation}
+
+\end{document}
