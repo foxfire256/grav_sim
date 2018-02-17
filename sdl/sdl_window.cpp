@@ -22,7 +22,7 @@ void sdl_window::init()
 {
 	done = 0;
 	int ret;
-	std::string window_title = "opengl_testing1";
+	std::string window_title = "Grav Sim";
 	int win_w = 768;
 	int win_h = 768;
 	

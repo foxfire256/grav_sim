@@ -86,9 +86,36 @@ void physics::init(uint16_t obj_count)
 		m[i] = dist_m(generator);
 
 		// TODO: detect and avoid collisions here
-		x[0][i] = Eigen::Vector3d(dist_d(generator),
-								dist_d(generator),
-								dist_d(generator));
+		bool collision = true;
+		while(collision)
+		{
+			// generate a new point
+			x[0][i] = Eigen::Vector3d(dist_d(generator),
+									dist_d(generator),
+									dist_d(generator));
+
+			// look for a collision
+			collision = false;
+			for(uint16_t j = 0; j < i; j++)
+			{
+				if(i == j)
+					continue;
+
+				// direction unit vector
+				Eigen::Vector3d ji_uv = (x[0][i] - x[0][j]).normalized();
+
+				// position plus radius in the direction of the other object
+				Eigen::Vector3d ji_r = x[0][j] + ji_uv * r[j];
+
+				double distance_j = (x[0][i] - ji_r).norm();
+				// if radius > distance to j object then collision
+				if(r[i] > distance_j)
+				{
+					collision = true;
+					break;
+				}
+			}
+		}
 
 		v[0][i] = Eigen::Vector3d(0.0, 0.0, 0.0);
 		a[0][i] = Eigen::Vector3d(0.0, 0.0, 0.0);
