@@ -38,6 +38,11 @@ void physics::step(double delta_t)
 
 		// TODO: RK4 here
 		v[next][i] = a[next][i] * delta_t + v[current][i];
+
+		// RK4 integration, see doc/grav_sim.tex
+		//Eigen::Vector3d vk1 = v[current][i];
+		//Eigen::Vector3d vk2 =
+
 		x[next][i] = v[next][i] * delta_t + x[current][i];
 	}
 
