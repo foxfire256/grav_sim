@@ -17,16 +17,17 @@ void physics::step(double delta_t)
 {
 	total_time += delta_t;
 
-	// TODO: make this RK4
 	// TODO: collision detection
 	#pragma omp parallel for
 	for(uint16_t i = 0; i < obj_count; i++)
 	{
+		// Euler
 		//a[current][i] = accel(x[current][i], i);
 		//v[next][i] = a[current][i] * delta_t + v[current][i];
 		//x[next][i] = v[next][i] * delta_t + x[current][i];
 
 		// RK4 integration, see doc/grav_sim.tex
+		// this is about 4x worse than Euler
 		Eigen::Vector3d xk1 = x[current][i];
 		Eigen::Vector3d vk1 = v[current][i];
 		Eigen::Vector3d ak1 = accel(x[current][i], i);

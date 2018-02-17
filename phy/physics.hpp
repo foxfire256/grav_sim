@@ -22,6 +22,12 @@ public:
 	std::vector<double> get_radii(){return r;}
 
 private:
+	/**
+	 * @brief Finds acceleration due to gravity
+	 * @param x_i Position
+	 * @param skip_index The index of the object that acceleration is calc
+	 * @return The acceleration vector
+	 */
 	Eigen::Vector3d accel(Eigen::Vector3d x_i, uint16_t skip_index);
 
 	/**
