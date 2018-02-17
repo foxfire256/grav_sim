@@ -22,32 +22,49 @@ void physics::step(double delta_t)
 	#pragma omp parallel for
 	for(uint16_t i = 0; i < obj_count; i++)
 	{
-		// find the force due to gravity first
-		Eigen::Vector3d f(0.0, 0.0, 0.0);
-		for(uint16_t j = 0; j < obj_count; j++)
-		{
-			if(i == j)
-				continue;
-
-			Eigen::Vector3d r = x[current][j] - x[current][i];
-			f += G * m[i] * m[j] * r.normalized() / r.squaredNorm();
-		}
-
-		//a[next][i] = f / m[i] + a[current][i];
-		a[next][i] = f / m[i];
-
-		// TODO: RK4 here
-		v[next][i] = a[next][i] * delta_t + v[current][i];
+		//a[current][i] = accel(x[current][i], i);
+		//v[next][i] = a[current][i] * delta_t + v[current][i];
+		//x[next][i] = v[next][i] * delta_t + x[current][i];
 
 		// RK4 integration, see doc/grav_sim.tex
-		//Eigen::Vector3d vk1 = v[current][i];
-		//Eigen::Vector3d vk2 =
+		Eigen::Vector3d xk1 = x[current][i];
+		Eigen::Vector3d vk1 = v[current][i];
+		Eigen::Vector3d ak1 = accel(x[current][i], i);
 
-		x[next][i] = v[next][i] * delta_t + x[current][i];
+		Eigen::Vector3d xk2 = x[current][i] + 0.5 * vk1 * delta_t;
+		Eigen::Vector3d vk2 = v[current][i] + 0.5 * ak1 * delta_t;
+		Eigen::Vector3d ak2 = accel(xk1, i);
+
+		Eigen::Vector3d xk3 = x[current][i] + 0.5 * vk2 * delta_t;
+		Eigen::Vector3d vk3 = v[current][i] + 0.5 * ak2 * delta_t;
+		Eigen::Vector3d ak3 = accel(xk3, i);
+
+		Eigen::Vector3d xk4 = x[current][i] + vk3 * delta_t;
+		Eigen::Vector3d vk4 = v[current][i] + ak3 * delta_t;
+		Eigen::Vector3d ak4 = accel(xk4, i);
+
+		v[next][i] = v[current][i] + (delta_t / 6.0) *
+				(ak1 + 2 * ak2 + 2 * ak3 + ak4);
+		x[next][i] = x[current][i] + (delta_t / 6.0) *
+				(vk1 + 2 * vk2 + 2 * vk3 + vk4);
 	}
 
 	current = current ? 0 : 1;
 	next = next ? 0 : 1;
+}
+
+Eigen::Vector3d physics::accel(Eigen::Vector3d x_i, uint16_t skip_index)
+{
+	Eigen::Vector3d a(0.0, 0.0, 0.0);
+	for(uint16_t j = 0; j < obj_count; j++)
+	{
+		if(skip_index == j)
+			continue;
+
+		Eigen::Vector3d r = x[current][j] - x_i;
+		a += G * m[j] * r.normalized() / r.squaredNorm();
+	}
+	return a;
 }
 
 void physics::init(uint16_t obj_count)

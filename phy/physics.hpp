@@ -22,6 +22,8 @@ public:
 	std::vector<double> get_radii(){return r;}
 
 private:
+	Eigen::Vector3d accel(Eigen::Vector3d x_i, uint16_t skip_index);
+
 	/**
 	 * @brief Current and next indicies
 	 */

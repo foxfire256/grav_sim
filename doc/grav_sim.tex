@@ -5,26 +5,44 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 
-
-
-
 % end of usepackage section -----------------------------------------------------
 
 \begin{document}
 
-Acceleration
+\section{Force from Gravity}
 \begin{equation}
-a = \frac{dv}{dt}
+\vec{F}_i = \sum_{i \neq j} \frac{G m_i m_j}{\vec{x}_{ij}^2} \hat{x}_{ij}
 \end{equation}
 
-Velocity
+\section{Acceleration}
 \begin{equation}
-v = \frac{dx}{dt}
+\vec{a}_i = \frac{\vec{F}_i}{m_i}
 \end{equation}
 
-Runge-Kutta
+\section{Velocity}
+\begin{equation}
+dv = a \, dt
+\end{equation}
+\begin{equation}
+\vec{v}_{n+1} = \vec{a}_n \Delta t + \vec{v}_n
+\end{equation}
+
+\section{Position}
+\begin{equation}
+dx = v \, dt
+\end{equation}
+
+\begin{equation}
+x_{n+1} = \vec{v}_{n+1} \Delta t + x_n
+\end{equation}
+
+\section{Runge-Kutta}
 \begin{equation}
 y_{n+1} = y_n + \tfrac{h}{6}\left(k_1 + 2k_2 + 2k_3 + k_4 \right)
+\end{equation}
+
+\begin{equation}
+h = \Delta t
 \end{equation}
 
 \begin{equation}
