@@ -19,7 +19,7 @@ void physics::step(double delta_t)
 
 	// TODO: collision detection
 	#pragma omp parallel for
-	for(uint16_t i = 0; i < obj_count; i++)
+	for(int i = 0; i < obj_count; i++)
 	{
 		// Euler
 		//a[current][i] = accel(x[current][i], i);

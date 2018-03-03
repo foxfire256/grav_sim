@@ -22,8 +22,8 @@ if(MSVC)
 	ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
 	ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE)
 	
-	SET(CMAKE_C_FLAGS "/MP ${CMAKE_C_FLAGS}")
-	SET(CMAKE_CXX_FLAGS "/MP ${CMAKE_CXX_FLAGS}")
+	SET(CMAKE_C_FLAGS "/openmp /MP ${CMAKE_C_FLAGS}")
+	SET(CMAKE_CXX_FLAGS "/openmp /MP ${CMAKE_CXX_FLAGS}")
 	
 	find_package(OpenGL REQUIRED)
 	
@@ -59,16 +59,16 @@ if(MSVC)
 
 	set(QT_DIR "C:\\Qt\\Qt5.10.0\\5.10.0\\msvc2017_64")
 	
-	find_package(Qt5Core)
-	find_package(Qt5Widgets)
-	find_package(Qt5OpenGL)
+	#find_package(Qt5Core)
+	#find_package(Qt5Widgets)
+	#find_package(Qt5OpenGL)
 	
-	set(QT_LIBS
-		${LIBS}
-		Qt5::Core Qt5::Widgets Qt5::OpenGL
-		${GLEW_LIBRARIES}
-		${OPENGL_LIBRARIES}
-		)
+	#set(QT_LIBS
+	#	${LIBS}
+	#	Qt5::Core Qt5::Widgets Qt5::OpenGL
+	#	${GLEW_LIBRARIES}
+	#	${OPENGL_LIBRARIES}
+	#	)
 	
 	include_directories("C:\\vclibs\\vc2015libs\\include")
 endif(MSVC)
@@ -292,14 +292,14 @@ add_executable(${PROJECT_NAME}_sdl
 target_link_libraries(${PROJECT_NAME}_sdl ${LIBS} ${SDL_LIBS})
 
 # Instruct CMake to run Qt moc automatically when needed.
-set(CMAKE_AUTOMOC ON)
-add_executable(${PROJECT_NAME}_qt
-	${MAIN_SOURCE_QT}
-	${SOURCE_GFX}
-	${SOURCE_COMMON}
-	${SOURCE_PHY})
-target_link_libraries(${PROJECT_NAME}_qt ${LIBS} ${QT_LIBS})
-set(CMAKE_AUTOMOC OFF)
+#set(CMAKE_AUTOMOC ON)
+#add_executable(${PROJECT_NAME}_qt
+#	${MAIN_SOURCE_QT}
+#	${SOURCE_GFX}
+#	${SOURCE_COMMON}
+#	${SOURCE_PHY})
+#target_link_libraries(${PROJECT_NAME}_qt ${LIBS} ${QT_LIBS})
+#set(CMAKE_AUTOMOC OFF)
 
 
 MESSAGE( STATUS "MINGW: " ${MINGW} )
@@ -313,7 +313,7 @@ MESSAGE( STATUS "CMAKE_C_FLAGS_RELEASE: " ${CMAKE_C_FLAGS_RELEASE} )
 MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
 MESSAGE( STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG} )
 MESSAGE( STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE} )
-get_target_property(QtCore_location Qt5::Core LOCATION)
-MESSAGE( STATUS "QtCore_location: " ${QtCore_location})
-get_target_property(QtWdigets_location Qt5::Widgets LOCATION)
-MESSAGE( STATUS "QtWdigets_location: " ${QtWdigets_location})
+#get_target_property(QtCore_location Qt5::Core LOCATION)
+#MESSAGE( STATUS "QtCore_location: " ${QtCore_location})
+#get_target_property(QtWdigets_location Qt5::Widgets LOCATION)
+#MESSAGE( STATUS "QtWdigets_location: " ${QtWdigets_location})

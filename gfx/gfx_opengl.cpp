@@ -218,10 +218,10 @@ void gfx_opengl::init(int w, int h)
 void gfx_opengl::update_matricies()
 {
 	#pragma omp parallel for
-	for(uint16_t i = 0; i < p->get_obj_count(); i++)
+	for(int i = 0; i < p->get_obj_count(); i++)
 	{
 		Eigen::Vector3d x = p->get_pos()[i];
-		Eigen::Vector3f x1 = {x[0], x[1], x[2]};
+		Eigen::Vector3f x1 = {(float)x[0], (float)x[1], (float)x[2]};
 		float scale = (float)(p->get_radii()[i]);
 		M[i] = Eigen::Translation3f(x1) * Eigen::Scaling(scale);
 
