@@ -95,7 +95,6 @@ void gfx_opengl::init(int w, int h)
 	glBindVertexArray(default_vao);
 	
 	// initialize some defaults
-	
 	eye = Eigen::Vector3f(0.0f, 0.0f, 10.0f);
 	target = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
 	up = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
@@ -149,7 +148,7 @@ void gfx_opengl::init(int w, int h)
 		
 		//this->texture_filename = m->mtl->texture_filename;
 	}
-		// otherwise create some defaults at least
+	// otherwise create some defaults at least
 	else
 	{
 		Ka = Eigen::Vector3f(0.3f, 0.3f, 0.3f);
@@ -317,16 +316,6 @@ void gfx_opengl::resize(int w, int h)
 	
 	glViewport(0, 0, win_w, win_h);
 	fox::gfx::perspective(65.0f, (float)win_w / (float)win_h, 0.01f, 40.0f, P);
-	//fox::gfx::ortho(0.0f, (float)win_w, 0.0f, (float)win_h, -10.0f, 10.0f, P);
-	
-	/*
-	MVP = P * MV;
-	
-	glUseProgram(shader_id);
-	int u;
-	u = glGetUniformLocation(shader_id, "MVP");
-	glUniformMatrix4fv(u, 1, GL_FALSE, MVP.data());
-	*/
 }
 
 void gfx_opengl::deinit()

@@ -6,7 +6,6 @@
 #include <random>
 #include <cstdint>
 #include <Eigen/Core>
-#include <Eigen/Geometry>
 
 class physics
 {

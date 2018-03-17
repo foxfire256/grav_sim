@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.0)
 # cmake version 3.0.0 is needed for block comments, 2.8.11 was the previous
 # min version
 
-# bad but needed from OpenMP
+# bad but needed for OpenMP
 if(APPLE)
 	# use clang from homebrew for OpenMP support
 	set(CMAKE_C_COMPILER "/usr/local/opt/llvm/bin/clang")
@@ -14,41 +14,43 @@ project(gs)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# this hasn't been tested for Visual studio as of 2018.01.20
 # this assumes you are running cmake from a build directory in the source directory
-# cmake .. -G "Visual Studio 14 2015 Win64"
 # cmake .. -G "Visual Studio 15 2017 Win64"
 if(MSVC)
 	ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
 	ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE)
+	ADD_DEFINITIONS(-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+	ADD_DEFINITIONS(-DBOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE)
 	
-	SET(CMAKE_C_FLAGS "/openmp /MP ${CMAKE_C_FLAGS}")
-	SET(CMAKE_CXX_FLAGS "/openmp /MP ${CMAKE_CXX_FLAGS}")
+	# /Oi enable intrinsic functions
+	# /GR- disable RTTI
+	SET(CMAKE_C_FLAGS "/openmp /arch:AVX /MP ${CMAKE_C_FLAGS}")
+	SET(CMAKE_CXX_FLAGS "/openmp /MP /std:c++latest /Oi /GR- /arch:AVX ${CMAKE_CXX_FLAGS}")
 	
 	find_package(OpenGL REQUIRED)
 	
-	set(VC_PREFIX "C:\\vclibs\\vc2015libs")
+	set(VC_PREFIX "C:\\vclibs\\vclibs")
 	
 	set(LIBS ${LIBS} kernel32.lib)
 	set(SDL2_LIBRARIES
-		optimized "C:\\vclibs\\vc2015libs\\lib\\SDL2main.lib"
-		debug "C:\\vclibs\\vc2015libs\\lib\\debug\\SDL2main.lib")
+		optimized "C:\\vclibs\\vclibs\\lib\\SDL2main.lib"
+		debug "C:\\vclibs\\vclibs\\lib\\SDL2maind.lib")
 	set(SDL2_LIBRARIES ${SDL2_LIBRARIES}
-		optimized "C:\\vclibs\\vc2015libs\\lib\\SDL2.lib"
-		debug "C:\\vclibs\\vc2015libs\\lib\\debug\\SDL2.lib")
+		optimized "C:\\vclibs\\vclibs\\lib\\SDL2.lib"
+		debug "C:\\vclibs\\vclibs\\lib\\SDL2d.lib")
 	set(GLEW_LIBRARIES
-		optimized "C:\\vclibs\\vc2015libs\\lib\\glew32.lib"
-		debug "C:\\vclibs\\vc2015libs\\lib\\debug\\glew32d.lib")
+		optimized "C:\\vclibs\\vclibs\\lib\\glew32.lib"
+		debug "C:\\vclibs\\vclibs\\lib\\glew32d.lib")
 	
 	set(BOOST_LIBS ${BOOST_LIBS}
-		optimized "C:\\vclibs\\vc2015libs\\lib\\libboost_program_options-vc140-mt-1_63.lib"
-		debug "C:\\vclibs\\vc2015libs\\lib\\debug\\libboost_program_options-vc140-mt-gd-1_63.lib")
+		optimized "C:\\vclibs\\vclibs\\lib\\libboost_program_options-vc141-mt-x64-1_66.lib"
+		debug "C:\\vclibs\\vclibs\\lib\\libboost_program_options-vc141-mt-gd-x64-1_66.lib")
 	set(BOOST_LIBS ${BOOST_LIBS}
-		optimized "C:\\vclibs\\vc2015libs\\lib\\libboost_system-vc140-mt-1_63.lib"
-		debug "C:\\vclibs\\vc2015libs\\lib\\debug\\libboost_system-vc140-mt-gd-1_63.lib")
+		optimized "C:\\vclibs\\vclibs\\lib\\libboost_system-vc141-mt-x64-1_66.lib"
+		debug "C:\\vclibs\\vclibs\\lib\\libboost_system-vc141-mt-gd-x64-1_66.lib")
 	set(BOOST_LIBS ${BOOST_LIBS}
-		optimized "C:\\vclibs\\vc2015libs\\lib\\libboost_filesystem-vc140-mt-1_63.lib"
-		debug "C:\\vclibs\\vc2015libs\\lib\\debug\\libboost_filesystem-vc140-mt-gd-1_63.lib")
+		optimized "C:\\vclibs\\vclibs\\lib\\libboost_filesystem-vc141-mt-x64-1_66.lib"
+		debug "C:\\vclibs\\vclibs\\lib\\libboost_filesystem-vc141-mt-gd-x64-1_66.lib")
 	
 	set(SDL_LIBS
 		${LIBS}
@@ -57,7 +59,7 @@ if(MSVC)
 		${OPENGL_LIBRARIES}
 		)
 
-	set(QT_DIR "C:\\Qt\\Qt5.10.0\\5.10.0\\msvc2017_64")
+	set(QT_DIR "C:\\Qt\\Qt5.10.1\\5.10.1\\msvc2017_64")
 	
 	#find_package(Qt5Core)
 	#find_package(Qt5Widgets)
@@ -70,7 +72,7 @@ if(MSVC)
 	#	${OPENGL_LIBRARIES}
 	#	)
 	
-	include_directories("C:\\vclibs\\vc2015libs\\include")
+	include_directories("C:\\vclibs\\vclibs\\include")
 endif(MSVC)
 
 if(MINGW OR MSYS)
