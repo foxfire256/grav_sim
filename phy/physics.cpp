@@ -48,6 +48,36 @@ void physics::step(double delta_t)
 				(ak1 + 2 * ak2 + 2 * ak3 + ak4);
 		x[next][i] = x[current][i] + (delta_t / 6.0) *
 				(vk1 + 2 * vk2 + 2 * vk3 + vk4);
+
+		// collision detection, does not change velocity
+		for(int j = 0; j < obj_count; j++)
+		{
+			if(j == i)
+				continue;
+
+			// next distance
+			double dn = (x[next][i] - x[current][j]).norm();
+			// max distance
+			double dm = r[i] + r[j];
+			if(dn < dm)
+			{
+				// unit vector of travel
+				Eigen::Vector3d xi = (x[next][i] - x[current][i]).normalized();
+				// length of old vector projected on to xi
+				double xipd = (x[current][j] - x[current][i]).dot(xi);
+				// old distance
+				double d_old = (x[current][j] - x[current][i]).norm();
+
+				// TODO: remove after debugged
+				// distance where xi is perpendicular to the collision object
+				double d_p_co = sqrt(pow(xipd, 2) + pow(d_old, 2));
+
+				// distance along xi until collision
+				double d = xipd - sqrt(pow(dm, 2) + pow(d_p_co, 2));
+
+				x[next][i] = d * xi + x[current][i];
+			}
+		}
 	}
 
 	current = current ? 0 : 1;

@@ -59,7 +59,7 @@ if(MSVC)
 		${OPENGL_LIBRARIES}
 		)
 
-	set(QT_DIR "C:\\Qt\\Qt5.10.1\\5.10.1\\msvc2017_64")
+	set(QT_DIR "C:\\Qt\\Qt5.11.1\\5.11.1\\msvc2017_64")
 	
 	#find_package(Qt5Core)
 	#find_package(Qt5Widgets)
