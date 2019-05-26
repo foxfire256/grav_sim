@@ -30,11 +30,11 @@ void physics::step(double delta_t)
 		// this is about 4x worse than Euler
 		Eigen::Vector3d xk1 = x[current][i];
 		Eigen::Vector3d vk1 = v[current][i];
-		Eigen::Vector3d ak1 = accel(x[current][i], i);
+		Eigen::Vector3d ak1 = accel(xk1, i);
 
 		Eigen::Vector3d xk2 = x[current][i] + 0.5 * vk1 * delta_t;
 		Eigen::Vector3d vk2 = v[current][i] + 0.5 * ak1 * delta_t;
-		Eigen::Vector3d ak2 = accel(xk1, i);
+		Eigen::Vector3d ak2 = accel(xk2, i);
 
 		Eigen::Vector3d xk3 = x[current][i] + 0.5 * vk2 * delta_t;
 		Eigen::Vector3d vk3 = v[current][i] + 0.5 * ak2 * delta_t;
@@ -50,6 +50,7 @@ void physics::step(double delta_t)
 				(vk1 + 2 * vk2 + 2 * vk3 + vk4);
 
 		// collision detection, does not change velocity
+		/*
 		for(int j = 0; j < obj_count; j++)
 		{
 			if(j == i)
@@ -78,6 +79,7 @@ void physics::step(double delta_t)
 				x[next][i] = d * xi + x[current][i];
 			}
 		}
+		*/
 	}
 
 	current = current ? 0 : 1;
