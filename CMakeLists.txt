@@ -218,8 +218,8 @@ if(NOT MSVC)
 	# -ftree-vectorize not sure how well this does
 	# -mavx
 	# -mavx2
-	set(CMAKE_C_FLAGS_RELEASE "-O3 -fopenmp")
-	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -fopenmp -w")
+	set(CMAKE_C_FLAGS_RELEASE "-O3 -fopenmp -mavx2")
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -fopenmp -mavx2 -w")
 	
 	# force some better debugging
 	# this should be gcc
@@ -234,8 +234,8 @@ if(NOT MSVC)
 	endif(APPLE)
 
 	# enable C11/C++14 for gcc and clang
-	set(EXTRA_CXX_FLAGS "-std=c++14 -Wno-deprecated-declarations -pipe")
-	set(EXTRA_C_FLAGS "-std=c11 -Wno-deprecated-declarations -pipe")
+	set(EXTRA_CXX_FLAGS "-std=c++17 -Wno-deprecated-declarations -pipe")
+	set(EXTRA_C_FLAGS "-std=c17 -Wno-deprecated-declarations -pipe")
 	
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_C_FLAGS}")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CXX_FLAGS}")
