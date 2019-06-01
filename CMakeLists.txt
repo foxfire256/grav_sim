@@ -16,6 +16,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # this assumes you are running cmake from a build directory in the source directory
 # cmake .. -G "Visual Studio 15 2017 Win64"
+# cmake .. -G "Visual Studio 16 2019" -A x64
 if(MSVC)
 	ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
 	ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE)
@@ -165,7 +166,7 @@ if(APPLE)
 endif(APPLE)
 
 # this probably only works on openSUSE Tumbleweed
-if(UNIX AND NOT APPLE)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	set(CMAKE_PREFIX_PATH "/usr")
 	set(CMAKE_INCLUDE_PATH "/usr/include")
 	set(CMAKE_LIBRARY_PATH "/usr/lib")
@@ -202,7 +203,45 @@ if(UNIX AND NOT APPLE)
 	include_directories("/usr/include")
 	include_directories("/usr/include/eigen3")
 
-endif(UNIX AND NOT APPLE)
+endif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+
+if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+    set(CMAKE_PREFIX_PATH "/usr/local")
+	set(CMAKE_INCLUDE_PATH "/usr/local/include")
+	set(CMAKE_LIBRARY_PATH "/usr/local/lib")
+
+	find_package(OpenGL REQUIRED)
+	find_library(OPENGL_LIBRARY NAMES GL)
+	find_package(Boost COMPONENTS program_options system filesystem REQUIRED)
+	include_directories(${Boost_INCLUDE_DIRS})
+	find_package(GLEW REQUIRED)
+	include_directories(${GLEW_INCLUDE_DIRS})
+	
+	INCLUDE(FindPkgConfig)
+	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+	include_directories(${SDL2_INCLUDE_DIR})
+	set(SDL_LIBS
+		${SDL2_LIBRARIES}
+		${GLEW_LIBRARIES}
+		${OPENGL_LIBRARIES}
+		)
+
+	set(BOOST_LIBS ${Boost_LIBRARIES})
+	set(LIBS -L/usr/local/lib ${LIBS} ${Boost_LIBRARIES})
+
+	find_package(Qt5Core)
+	find_package(Qt5Widgets)
+	find_package(Qt5OpenGL)
+	
+	set(QT_LIBS
+		Qt5::Core Qt5::Widgets Qt5::OpenGL
+		${GLEW_LIBRARIES}
+		${OPENGL_LIBRARIES}
+		)
+ 
+	include_directories("/usr/local/include")
+	include_directories("/usr/local/include/eigen3")
+endif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
 
 include_directories("../common-cpp")
 
