@@ -4,7 +4,7 @@
 
 qt_window::qt_window()
 {
-
+	
 }
 
 void qt_window::render()
@@ -15,4 +15,5 @@ void qt_window::render()
 void qt_window::initialize()
 {
 	opengl_window::initialize();
+	this->resize(768, 768);
 }
