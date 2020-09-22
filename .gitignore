@@ -1,5 +1,6 @@
 *.o
 build/*
+build2/*
 *.exe
 cmake-build-debug/*
 cmake-build-release/*
