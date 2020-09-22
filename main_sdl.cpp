@@ -9,10 +9,15 @@ extern "C"
 }
 #endif
 
+#include <omp.h>
+
 #include "sdl/sdl_window.hpp"
 
 int main(int argc, char **argv)
 {
+	omp_set_dynamic(0);     // Explicitly disable dynamic teams
+	omp_set_num_threads(6);
+	
 	sdl_window w;
 	
 	w.init();
