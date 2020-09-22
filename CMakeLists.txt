@@ -7,7 +7,7 @@ if(APPLE)
 	set(CMAKE_C_COMPILER "/usr/local/opt/llvm/bin/clang")
 	set(CMAKE_CXX_COMPILER "/usr/local/opt/llvm/bin/clang++")
 endif(APPLE)
-project(gs)
+project(grav_sim)
 
 # http://www.cmake.org/Wiki/CMake_Useful_Variables
 
@@ -56,17 +56,16 @@ if(MSVC)
 		${OPENGL_LIBRARIES}
 		)
 
+	#find_package(Qt5Core)
+	#find_package(Qt5Widgets)
+	#find_package(Qt5OpenGL)
 	
-	find_package(Qt5Core)
-	find_package(Qt5Widgets)
-	find_package(Qt5OpenGL)
-	
-	set(QT_LIBS
-		${LIBS}
-		Qt5::Core Qt5::Widgets Qt5::OpenGL
-		${GLEW_LIBRARIES}
-		${OPENGL_LIBRARIES}
-		)
+	#set(QT_LIBS
+	#	${LIBS}
+	#	Qt5::Core Qt5::Widgets Qt5::OpenGL
+	#	${GLEW_LIBRARIES}
+	#	${OPENGL_LIBRARIES}
+	#	)
 	
 	include_directories("C:\\usr\\vclibs\\include")
 endif(MSVC)
@@ -95,15 +94,15 @@ if(MINGW OR MSYS)
 		${OPENGL_LIBRARIES}
 		)
 
-	find_package(Qt5Core)
-	find_package(Qt5Widgets)
-	find_package(Qt5OpenGL)
+	#find_package(Qt5Core)
+	#find_package(Qt5Widgets)
+	#find_package(Qt5OpenGL)
 	
-	set(QT_LIBS
-		Qt5::Core Qt5::Widgets Qt5::OpenGL
-		-lglew32
-		${OPENGL_LIBRARIES}
-		)
+	#set(QT_LIBS
+	#	Qt5::Core Qt5::Widgets Qt5::OpenGL
+	#	-lglew32
+	#	${OPENGL_LIBRARIES}
+	#	)
 	
 	include_directories("c:/msys64/mingw64/include/eigen3")
 endif(MINGW OR MSYS)
@@ -143,18 +142,18 @@ if(APPLE)
 	# If there are problems with qt5 on Apple run 'which qmake' and make sure
 	# it is the correct one. Usually you have to run 'brew link qt5 --force'.
 	# Anaconda causes problems too since it has qt4 and other libs.
-	set(QT_DIR "/usr/local/opt/qt")
-	find_package(Qt5Core)
-	find_package(Qt5Widgets)
-	find_package(Qt5OpenGL)
+	#set(QT_DIR "/usr/local/opt/qt")
+	#find_package(Qt5Core)
+	#find_package(Qt5Widgets)
+	#find_package(Qt5OpenGL)
 	
-	set(QT_LIBS
-		-L/usr/local/opt/qt/lib Qt5::Core Qt5::Widgets Qt5::OpenGL
-		${GLEW_LIBRARIES}
-		${OPENGL_LIBRARIES}
-		)
+	#set(QT_LIBS
+	#	-L/usr/local/opt/qt/lib Qt5::Core Qt5::Widgets Qt5::OpenGL
+	#	${GLEW_LIBRARIES}
+	#	${OPENGL_LIBRARIES}
+	#	)
 	
-	include_directories("/usr/local/opt/qt/include")
+	#include_directories("/usr/local/opt/qt/include")
 	
 	include_directories("/usr/local/include")
 	include_directories("/usr/local/include/eigen3")
@@ -185,15 +184,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	set(BOOST_LIBS ${Boost_LIBRARIES})
 	set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
-	find_package(Qt5Core)
-	find_package(Qt5Widgets)
-	find_package(Qt5OpenGL)
+	#find_package(Qt5Core)
+	#find_package(Qt5Widgets)
+	#find_package(Qt5OpenGL)
 	
-	set(QT_LIBS
-		Qt5::Core Qt5::Widgets Qt5::OpenGL
-		${GLEW_LIBRARIES}
-		${OPENGL_LIBRARIES}
-		)
+	#set(QT_LIBS
+	#	Qt5::Core Qt5::Widgets Qt5::OpenGL
+	#	${GLEW_LIBRARIES}
+	#	${OPENGL_LIBRARIES}
+	#	)
  
 	include_directories("/usr/include")
 	include_directories("/usr/include/eigen3")
@@ -224,15 +223,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
 	set(BOOST_LIBS ${Boost_LIBRARIES})
 	set(LIBS -L/usr/local/lib ${LIBS} ${Boost_LIBRARIES})
 
-	find_package(Qt5Core)
-	find_package(Qt5Widgets)
-	find_package(Qt5OpenGL)
+	#find_package(Qt5Core)
+	#find_package(Qt5Widgets)
+	#find_package(Qt5OpenGL)
 	
-	set(QT_LIBS
-		Qt5::Core Qt5::Widgets Qt5::OpenGL
-		${GLEW_LIBRARIES}
-		${OPENGL_LIBRARIES}
-		)
+	#set(QT_LIBS
+	#	Qt5::Core Qt5::Widgets Qt5::OpenGL
+	#	${GLEW_LIBRARIES}
+	#	${OPENGL_LIBRARIES}
+	#	)
  
 	include_directories("/usr/local/include")
 	include_directories("/usr/local/include/eigen3")
@@ -320,22 +319,26 @@ else(APPLE)
 	set(LIBRARY_TYPE STATIC)
 endif(APPLE)
 
-add_executable(${PROJECT_NAME}_sdl
+add_executable(${PROJECT_NAME}
 	${MAIN_SOURCE_SDL}
 	${SOURCE_GFX}
 	${SOURCE_COMMON}
 	${SOURCE_PHY})
-target_link_libraries(${PROJECT_NAME}_sdl ${LIBS} ${SDL_LIBS})
+target_link_libraries(${PROJECT_NAME} ${LIBS} ${SDL_LIBS})
+
+if(MSVC)
+	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+endif(MSVC)
 
 # Instruct CMake to run Qt moc automatically when needed.
-set(CMAKE_AUTOMOC ON)
-add_executable(${PROJECT_NAME}_qt
-	${MAIN_SOURCE_QT}
-	${SOURCE_GFX}
-	${SOURCE_COMMON}
-	${SOURCE_PHY})
-target_link_libraries(${PROJECT_NAME}_qt ${LIBS} ${QT_LIBS})
-set(CMAKE_AUTOMOC OFF)
+#set(CMAKE_AUTOMOC ON)
+#add_executable(${PROJECT_NAME}_qt
+#	${MAIN_SOURCE_QT}
+#	${SOURCE_GFX}
+#	${SOURCE_COMMON}
+#	${SOURCE_PHY})
+#target_link_libraries(${PROJECT_NAME}_qt ${LIBS} ${QT_LIBS})
+#set(CMAKE_AUTOMOC OFF)
 
 
 MESSAGE( STATUS "MINGW: " ${MINGW} )
@@ -350,7 +353,7 @@ MESSAGE( STATUS "CMAKE_C_FLAGS_RELEASE: " ${CMAKE_C_FLAGS_RELEASE} )
 MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
 MESSAGE( STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG} )
 MESSAGE( STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE} )
-get_target_property(QtCore_location Qt5::Core LOCATION)
-MESSAGE( STATUS "QtCore_location: " ${QtCore_location})
-get_target_property(QtWdigets_location Qt5::Widgets LOCATION)
-MESSAGE( STATUS "QtWdigets_location: " ${QtWdigets_location})
+#get_target_property(QtCore_location Qt5::Core LOCATION)
+#MESSAGE( STATUS "QtCore_location: " ${QtCore_location})
+#get_target_property(QtWdigets_location Qt5::Widgets LOCATION)
+#MESSAGE( STATUS "QtWdigets_location: " ${QtWdigets_location})
