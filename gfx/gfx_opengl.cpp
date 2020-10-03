@@ -18,6 +18,7 @@
 #include "fox/obj_model_loader.h"
 
 #include "phy/physics.hpp"
+#include "phy/physics_simd_test.hpp"
 
 #ifdef __ANDROID__
 std::string data_root = "/sdcard/grav_sim";
@@ -35,19 +36,25 @@ int print_opengl_error2(char *file, int line);
 gfx_opengl::gfx_opengl() : gfx()
 {
 	p = new physics();
+	p2 = new physics_simd_test();
+	simd_test_mode = true;
 }
 
 gfx_opengl::~gfx_opengl()
 {
 	delete p;
+	delete p2;
 }
 
 void gfx_opengl::init(int w, int h)
 {
 	win_w = w;
 	win_h = h;
+
+	obj_count = 512;
 	
-	p->init(512);
+	p->init(obj_count);
+	p2->init(obj_count);
 
 	// init glew first
 	glewExperimental = GL_TRUE; // Needed in core profile
@@ -108,11 +115,11 @@ void gfx_opengl::init(int w, int h)
 	light_pos = Eigen::Vector4f(eye[0], eye[1], eye[2], 1.0f);
 	fox::gfx::perspective(65.0f, (float)w / (float)h, 0.01f, 40.0f, P);
 	
-	M.resize(p->get_obj_count());
-	MV.resize(p->get_obj_count());
-	MVP.resize(p->get_obj_count());
-	normal_matrix.resize(p->get_obj_count());
-	for(uint16_t i = 0; i < p->get_obj_count(); i++)
+	M.resize(obj_count);
+	MV.resize(obj_count);
+	MVP.resize(obj_count);
+	normal_matrix.resize(obj_count);
+	for(uint16_t i = 0; i < obj_count; i++)
 	{
 		M[i] = Eigen::Matrix4f::Identity();
 	}
@@ -217,11 +224,24 @@ void gfx_opengl::init(int w, int h)
 void gfx_opengl::update_matricies()
 {
 	#pragma omp parallel for
-	for(int i = 0; i < p->get_obj_count(); i++)
+	for(int i = 0; i < obj_count; i++)
 	{
-		Eigen::Vector3d x = p->get_pos()[i];
-		Eigen::Vector3f x1 = {(float)x[0], (float)x[1], (float)x[2]};
-		float scale = (float)(p->get_radii()[i]);
+		//Eigen::Vector3d x;
+		Eigen::Vector3f x1;
+		float scale;
+		if(!simd_test_mode)
+		{
+			auto x = p->get_pos()[i];
+			x1 = { (float)x[0], (float)x[1], (float)x[2] };
+			scale = (float)(p->get_radii()[i]);
+		}
+		else
+		{
+			auto x2 = p2->get_pos()[i];
+			x1 = { (float)x2[0], (float)x2[1], (float)x2[2] };
+			scale = (float)(p2->get_radii()[i]);
+		}
+		
 		M[i] = Eigen::Translation3f(x1) * Eigen::Scaling(scale);
 
 		MV[i] = V * M[i];
@@ -247,7 +267,14 @@ void gfx_opengl::render()
 	// TODO: this isn't the most accurate way to calc FPS
 	render_times[perf_index] = perf_counter->update_double();
 
-	p->step(phy_counter->update_double());
+	if(!simd_test_mode)
+	{
+		p->step(phy_counter->update_double());
+	}
+	else
+	{
+		p2->step(phy_counter->update_double());
+	}
 	phys_times[perf_index] = perf_counter->update_double();
 
 	update_matricies();
@@ -279,7 +306,6 @@ void gfx_opengl::render()
 
 	glUseProgram(shader_id);
 
-
 	GLint vertex_loc, normal_loc;
 	vertex_loc = glGetAttribLocation(shader_id, "vertex");
 	normal_loc = glGetAttribLocation(shader_id, "normal");
@@ -293,7 +319,16 @@ void gfx_opengl::render()
 	glVertexAttribPointer(normal_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	int u;
-	for(uint16_t i = 0; i < p->get_obj_count(); i++)
+	uint16_t obj_count;
+	if(!simd_test_mode)
+	{
+		obj_count = p->get_obj_count();
+	}
+	else
+	{
+		obj_count = p2->get_obj_count();
+	}
+	for(uint16_t i = 0; i < obj_count; i++)
 	{
 		// TODO: use UBO's here
 		u = glGetUniformLocation(shader_id, "MVP");
@@ -340,6 +375,7 @@ void gfx_opengl::deinit()
 	delete phy_counter;
 
 	p->deinit();
+	p2->deinit();
 }
 
 void gfx_opengl::load_shaders()

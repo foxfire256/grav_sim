@@ -304,6 +304,8 @@ set(SOURCE_GFX
 set(SOURCE_PHY
 	phy/physics.hpp
 	phy/physics.cpp
+	phy/physics_simd_test.hpp
+	phy/physics_simd_test.cpp
 	)
 
 set(MAIN_SOURCE_SDL

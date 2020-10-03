@@ -15,8 +15,8 @@ extern "C"
 
 int main(int argc, char **argv)
 {
-	omp_set_dynamic(0);     // Explicitly disable dynamic teams
-	omp_set_num_threads(6);
+	//omp_set_dynamic(0);     // Explicitly disable dynamic teams
+	//omp_set_num_threads(6);
 	
 	sdl_window w;
 	

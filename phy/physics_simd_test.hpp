@@ -1,23 +1,23 @@
-#ifndef PHYSICS_HPP
-#define PHYSICS_HPP
+#ifndef PHYSICS_SIMD_TEST_HPP
+#define PHYSICS_SIMD_TEST_HPP
 
 #define _USE_MATH_DEFINES
 #include <vector>
+#include <array>
 #include <random>
 #include <cstdint>
-#include <Eigen/Core>
 
-class physics
+class physics_simd_test
 {
 public:
-	physics();
-	virtual ~physics();
+	physics_simd_test();
+	virtual ~physics_simd_test();
 
 	void init(uint16_t obj_count);
 	void deinit();
 	void step(double delta_t);
 	uint16_t get_obj_count(){return obj_count;}
-	std::vector<Eigen::Vector3d>& get_pos(){return x[current];}
+	std::vector<std::array<double, 3>>& get_pos(){return x[current];}
 	std::vector<double> get_radii(){return r;}
 
 private:
@@ -27,7 +27,7 @@ private:
 	 * @param skip_index The index of the object that acceleration is calc
 	 * @return The acceleration vector
 	 */
-	Eigen::Vector3d accel(Eigen::Vector3d x_i, uint16_t skip_index);
+	std::array<double, 3> accel(const std::array<double, 3>& x_i, uint16_t skip_index);
 
 	/**
 	 * @brief Current and next indicies
@@ -41,15 +41,15 @@ private:
 	/**
 	 * @brief Position (x1, x2, x3), two vectors for new and old
 	 */
-	std::vector<Eigen::Vector3d> x[2];
+	std::array<std::vector<std::array<double, 3>>, 2> x;
 	/**
 	 * @brief Velocity, two vectors for new and old
 	 */
-	std::vector<Eigen::Vector3d> v[2];
+	std::array<std::vector<std::array<double, 3>>, 2> v;
 	/**
 	 * @brief Acceleration, two vectors for new and old
 	 */
-	std::vector<Eigen::Vector3d> a[2];
+	std::array<std::vector<std::array<double, 3>>, 2> a;
 	/**
 	 * @brief Ocject radii
 	 */
