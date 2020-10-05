@@ -62,115 +62,71 @@ if(MSVC)
 	include_directories("C:\\usr\\vclibs\\include")
 endif(MSVC)
 
-if(MINGW OR MSYS)
-	set(CMAKE_PREFIX_PATH "c:/msys64/mingw64")
-	set(CMAKE_INCLUDE_PATH "c:/msys64/mingw64/include")
-	set(CMAKE_LIBRARY_PATH "c:/msys64/mingw64/lib")
-	
-	find_package(OpenGL REQUIRED)
-	find_library(OPENGL_LIBRARY NAMES GL)
-	find_package(Boost COMPONENTS program_options system filesystem REQUIRED)
-	include_directories(${Boost_INCLUDE_DIRS})
-	find_package(GLEW REQUIRED)
-	include_directories(${GLEW_INCLUDE_DIRS})
-
-	set(BOOST_LIBS ${Boost_LIBRARIES})
-	set(LIBS ${LIBS} ${Boost_LIBRARIES})
-	
-	INCLUDE(FindPkgConfig)
-	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
-	include_directories(${SDL2_INCLUDE_DIR})
-	set(SDL_LIBS
-		${SDL2_LIBRARIES}
-		-lglew32
-		${OPENGL_LIBRARIES}
-		)
+if(MINGW OR MSYS OR UNIX)
+	if(UNIX)
+        set(OpenGL_GL_PREFERENCE GLVND)
+		find_package(OpenGL REQUIRED)
+		find_library(OPENGL_LIBRARY NAMES OpenGL)
+		set(LIBS ${LIBS} -lpthread)
+	elseif(MINGW OR MSYS)
+		find_package(OpenGL REQUIRED)
+		find_library(OPENGL_LIBRARY NAMES OpenGL32 opengl32)
+		set(LIBS ${LIBS} -lmingw32)
+		set(QT_DIR "c:/msys64/mingw64")
+	endif(UNIX)
 
 	#find_package(Qt5Core)
 	#find_package(Qt5Widgets)
+	#find_package(Qt5Gui)
 	#find_package(Qt5OpenGL)
-	
-	#set(QT_LIBS
-	#	Qt5::Core Qt5::Widgets Qt5::OpenGL
-	#	-lglew32
-	#	${OPENGL_LIBRARIES}
-	#	)
-	
-	include_directories("c:/msys64/mingw64/include/eigen3")
-endif(MINGW OR MSYS)
 
-# this probably only works on openSUSE Tumbleweed
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-	set(CMAKE_PREFIX_PATH "/usr")
-	set(CMAKE_INCLUDE_PATH "/usr/include")
-	set(CMAKE_LIBRARY_PATH "/usr/lib")
-
-	find_package(OpenGL REQUIRED)
-	find_library(OPENGL_LIBRARY NAMES GL)
+	#set(QT_LIBS Qt5::Core Qt5::Widgets Qt5::Gui Qt5::OpenGL)
+	
 	find_package(Boost COMPONENTS program_options system filesystem REQUIRED)
 	include_directories(${Boost_INCLUDE_DIRS})
+	set(BOOST_LIBS ${Boost_LIBRARIES})
 	find_package(GLEW REQUIRED)
 	include_directories(${GLEW_INCLUDE_DIRS})
-	
 	INCLUDE(FindPkgConfig)
 	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 	include_directories(${SDL2_INCLUDE_DIR})
+
 	set(SDL_LIBS
 		${SDL2_LIBRARIES}
 		${GLEW_LIBRARIES}
 		${OPENGL_LIBRARIES}
 		)
+	if(MINGW OR MSYS)
+		set(SDL_LIBS -lglew32 ${SDL_LIBS})
+	endif()
 
 	set(BOOST_LIBS ${Boost_LIBRARIES})
 	set(LIBS ${LIBS} ${Boost_LIBRARIES})
-
-	#find_package(Qt5Core)
-	#find_package(Qt5Widgets)
-	#find_package(Qt5OpenGL)
 	
-	#set(QT_LIBS
-	#	Qt5::Core Qt5::Widgets Qt5::OpenGL
-	#	${GLEW_LIBRARIES}
-	#	${OPENGL_LIBRARIES}
-	#	)
- 
-	include_directories("/usr/include")
-	include_directories("/usr/include/eigen3")
-
-endif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-
-include_directories("../common-cpp")
-
-if(NOT MSVC)
-	# --------------------------------------------------------------------------
-	# WARNING: all warnings are disabled for GCC
-	# --------------------------------------------------------------------------
+	if(UNIX)
+		include_directories("/usr/include")
+		include_directories("/usr/include/eigen3")
+	elseif(MINGW OR MSYS)
+		include_directories("c:/msys64/mingw64/include")
+		include_directories("c:/msys64/mingw64/include/eigen3")
+	endif(UNIX)
 	
-	# better optimizations
-	# -O3 still IEEE754 compliant
-	# -Ofast not IEEE754 compliant, faster than -O3
-	# -ffast-math not needed with -Ofast
-	# -ftree-vectorize not sure how well this does
-	# -mavx
-	# -mavx2
-	set(CMAKE_C_FLAGS_RELEASE "-O3 -fopenmp -mavx2")
-	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -fopenmp -mavx2 -w")
+	set(CMAKE_C_FLAGS_RELEASE "-O3")
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 	
-	# force some better debugging
-	# this should be gcc
 	set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -Og")
 	set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -Og -w")
 
-	# enable C11/C++14 for gcc and clang
-	set(EXTRA_CXX_FLAGS "-std=c++17 -Wno-deprecated-declarations -pipe")
-	set(EXTRA_C_FLAGS "-std=c17 -Wno-deprecated-declarations -pipe")
+	set(EXTRA_CXX_FLAGS "-std=c++17 -fopenmp -mavx2 -Wno-deprecated-declarations -pipe -frtti")
+	set(EXTRA_C_FLAGS "-std=c17 -fopenmp -mavx2 -Wno-deprecated-declarations -pipe")
 	
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_C_FLAGS}")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CXX_FLAGS}")
 	
-	# pipe keeps compilation in memory
 	set(CMAKE_LD_FLAGS "-pipe")
-endif(NOT MSVC)
+
+	include_directories("common-cpp")
+endif(MINGW OR MSYS OR UNIX)
 
 set(MAIN_SOURCE_QT
 	main_qt.cpp
@@ -180,8 +136,8 @@ set(MAIN_SOURCE_QT
 	qt/opengl_window.cpp
 )
 set(SOURCE_COMMON
-	../common-cpp/fox/counter.hpp
-	../common-cpp/fox/counter.cpp
+	common-cpp/fox/counter.hpp
+	common-cpp/fox/counter.cpp
 	)
 set(SOURCE_GFX
 	gfx/gfx.hpp
@@ -190,10 +146,10 @@ set(SOURCE_GFX
 	gfx/gfx_factory.cpp
 	gfx/gfx_opengl.hpp
 	gfx/gfx_opengl.cpp
-	../common-cpp/fox/gfx/eigen_opengl.hpp
-	../common-cpp/fox/gfx/eigen_opengl.cpp
-	../common-cpp/fox/obj_model_loader.h
-	../common-cpp/fox/obj_model_loader.c
+	common-cpp/fox/gfx/eigen_opengl.hpp
+	common-cpp/fox/gfx/eigen_opengl.cpp
+	common-cpp/fox/obj_model_loader.h
+	common-cpp/fox/obj_model_loader.c
 	)
 
 set(SOURCE_PHY
