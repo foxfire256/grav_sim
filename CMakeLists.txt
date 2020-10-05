@@ -124,9 +124,9 @@ if(MINGW OR MSYS OR UNIX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CXX_FLAGS}")
 	
 	set(CMAKE_LD_FLAGS "-pipe")
-
-	include_directories("common-cpp")
 endif(MINGW OR MSYS OR UNIX)
+
+include_directories("common-cpp")
 
 set(MAIN_SOURCE_QT
 	main_qt.cpp
