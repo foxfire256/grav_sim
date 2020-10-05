@@ -1,15 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 # cmake version 3.6 is required for Visual Studio startup project
 
-# bad but needed for OpenMP
-if(APPLE)
-	# use clang from homebrew for OpenMP support
-	set(CMAKE_C_COMPILER "/usr/local/opt/llvm/bin/clang")
-	set(CMAKE_CXX_COMPILER "/usr/local/opt/llvm/bin/clang++")
-endif(APPLE)
 project(grav_sim)
-
-# http://www.cmake.org/Wiki/CMake_Useful_Variables
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -107,58 +99,6 @@ if(MINGW OR MSYS)
 	include_directories("c:/msys64/mingw64/include/eigen3")
 endif(MINGW OR MSYS)
 
-if(APPLE)
-	set(CMAKE_PREFIX_PATH "/usr/local")
-	set(CMAKE_INCLUDE_PATH "/usr/local/include")
-	set(CMAKE_LIBRARY_PATH "/usr/local/lib")
-	
-	set(CMAKE_C_COMPILER "/usr/local/opt/llvm/bin/clang")
-	set(CMAKE_CXX_COMPILER "/usr/local/opt/llvm/bin/clang++")
-	include_directories("/usr/local/opt/llvm/include")
-	
-	find_package(OpenGL REQUIRED)
-	find_package(Boost COMPONENTS program_options system filesystem REQUIRED)
-	include_directories(${Boost_INCLUDE_DIRS})
-	find_package(GLEW REQUIRED)
-	include_directories(${GLEW_INCLUDE_DIRS})
-
-	set(BOOST_LIBS ${Boost_LIBRARIES})
-	set(LIBS
-		-L/usr/local/lib
-		-L/usr/local/opt/llvm/lib
-		${LIBS}
-		${Boost_LIBRARIES}
-	)
-	
-	INCLUDE(FindPkgConfig)
-	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
-	include_directories(${SDL2_INCLUDE_DIR})
-	set(SDL_LIBS
-		${SDL2_LIBRARIES}
-		${GLEW_LIBRARIES}
-		${OPENGL_LIBRARIES}
-		)
-
-	# If there are problems with qt5 on Apple run 'which qmake' and make sure
-	# it is the correct one. Usually you have to run 'brew link qt5 --force'.
-	# Anaconda causes problems too since it has qt4 and other libs.
-	#set(QT_DIR "/usr/local/opt/qt")
-	#find_package(Qt5Core)
-	#find_package(Qt5Widgets)
-	#find_package(Qt5OpenGL)
-	
-	#set(QT_LIBS
-	#	-L/usr/local/opt/qt/lib Qt5::Core Qt5::Widgets Qt5::OpenGL
-	#	${GLEW_LIBRARIES}
-	#	${OPENGL_LIBRARIES}
-	#	)
-	
-	#include_directories("/usr/local/opt/qt/include")
-	
-	include_directories("/usr/local/include")
-	include_directories("/usr/local/include/eigen3")
-endif(APPLE)
-
 # this probably only works on openSUSE Tumbleweed
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	set(CMAKE_PREFIX_PATH "/usr")
@@ -199,44 +139,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
 endif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
-if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-    set(CMAKE_PREFIX_PATH "/usr/local")
-	set(CMAKE_INCLUDE_PATH "/usr/local/include")
-	set(CMAKE_LIBRARY_PATH "/usr/local/lib")
-
-	find_package(OpenGL REQUIRED)
-	find_library(OPENGL_LIBRARY NAMES GL)
-	find_package(Boost COMPONENTS program_options system filesystem REQUIRED)
-	include_directories(${Boost_INCLUDE_DIRS})
-	find_package(GLEW REQUIRED)
-	include_directories(${GLEW_INCLUDE_DIRS})
-	
-	INCLUDE(FindPkgConfig)
-	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
-	include_directories(${SDL2_INCLUDE_DIR})
-	set(SDL_LIBS
-		${SDL2_LIBRARIES}
-		${GLEW_LIBRARIES}
-		${OPENGL_LIBRARIES}
-		)
-
-	set(BOOST_LIBS ${Boost_LIBRARIES})
-	set(LIBS -L/usr/local/lib ${LIBS} ${Boost_LIBRARIES})
-
-	#find_package(Qt5Core)
-	#find_package(Qt5Widgets)
-	#find_package(Qt5OpenGL)
-	
-	#set(QT_LIBS
-	#	Qt5::Core Qt5::Widgets Qt5::OpenGL
-	#	${GLEW_LIBRARIES}
-	#	${OPENGL_LIBRARIES}
-	#	)
- 
-	include_directories("/usr/local/include")
-	include_directories("/usr/local/include/eigen3")
-endif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-
 include_directories("../common-cpp")
 
 if(NOT MSVC)
@@ -256,15 +158,8 @@ if(NOT MSVC)
 	
 	# force some better debugging
 	# this should be gcc
-	if(NOT APPLE)
-		set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -Og")
-		set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -Og -w")
-	endif(NOT APPLE)
-	# and this should be clang
-	if(APPLE)
-		set(CMAKE_C_FLAGS_DEBUG "-O0 -g3")
-		set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3")
-	endif(APPLE)
+	set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -Og")
+	set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -Og -w")
 
 	# enable C11/C++14 for gcc and clang
 	set(EXTRA_CXX_FLAGS "-std=c++17 -Wno-deprecated-declarations -pipe")
@@ -314,12 +209,8 @@ set(MAIN_SOURCE_SDL
 	sdl/sdl_window.cpp
 )
 
-# static libraries don't work so well on Apple for some reason
-if(APPLE)
-	set(LIBRARY_TYPE SHARED)
-else(APPLE)
-	set(LIBRARY_TYPE STATIC)
-endif(APPLE)
+
+set(LIBRARY_TYPE STATIC)
 
 add_executable(${PROJECT_NAME}
 	${MAIN_SOURCE_SDL}
@@ -341,21 +232,3 @@ endif(MSVC)
 #	${SOURCE_PHY})
 #target_link_libraries(${PROJECT_NAME}_qt ${LIBS} ${QT_LIBS})
 #set(CMAKE_AUTOMOC OFF)
-
-
-MESSAGE( STATUS "MINGW: " ${MINGW} )
-MESSAGE( STATUS "MSYS: " ${MSYS} )
-MESSAGE( STATUS "MSVC: " ${MSVC} )
-MESSAGE( STATUS "APPLE: " ${APPLE} )
-MESSAGE( STATUS "INCLUDE_DIRECTORIES: " ${INCLUDE_DIRECTORIES} )
-MESSAGE( STATUS "GLEW_LIBRARIES: " ${GLEW_LIBRARIES} )
-MESSAGE( STATUS "CMAKE_C_FLAGS: " ${CMAKE_C_FLAGS} )
-MESSAGE( STATUS "CMAKE_C_FLAGS_DEBUG: " ${CMAKE_C_FLAGS_DEBUG} )
-MESSAGE( STATUS "CMAKE_C_FLAGS_RELEASE: " ${CMAKE_C_FLAGS_RELEASE} )
-MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
-MESSAGE( STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG} )
-MESSAGE( STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE} )
-#get_target_property(QtCore_location Qt5::Core LOCATION)
-#MESSAGE( STATUS "QtCore_location: " ${QtCore_location})
-#get_target_property(QtWdigets_location Qt5::Widgets LOCATION)
-#MESSAGE( STATUS "QtWdigets_location: " ${QtWdigets_location})

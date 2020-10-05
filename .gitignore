@@ -11,4 +11,7 @@ doc/*.log
 doc/*.out
 doc/*.pdf
 doc/*.gz
-
+.idea/*
+.idea
+cmake-build*
+cmake-build-relwithdebinfo/*
